@@ -6,7 +6,7 @@ import { motion } from 'framer-motion';
 import { 
   Users, Building2, TrendingUp, DollarSign, 
   Eye, CheckCircle, XCircle, Phone, Mail,
-  Search, Filter
+  Search, Filter, Trash2
 } from 'lucide-react';
 
 export default function AdminDashboard() {
@@ -122,6 +122,36 @@ export default function AdminDashboard() {
     } catch (error) {
       console.error('Error approving builder:', error);
       alert('Failed to approve builder');
+    }
+  };
+
+  const handleDeleteProperty = async (propertyId: string) => {
+    if (!confirm('Are you sure you want to delete this property? This action cannot be undone.')) {
+      return;
+    }
+
+    try {
+      const token = sessionStorage.getItem('adminToken');
+      const response = await fetch('/api/admin/delete-property', {
+        method: 'DELETE',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ propertyId })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        alert('Property deleted successfully!');
+        fetchProperties();
+      } else {
+        alert('Error: ' + data.error);
+      }
+    } catch (error) {
+      console.error('Error deleting property:', error);
+      alert('Failed to delete property');
     }
   };
 
@@ -320,8 +350,17 @@ export default function AdminDashboard() {
                           </div>
                         </div>
                         
-                        {/* Media Display */}
+                        {/* Actions & Media Display */}
                         <div className="space-y-4">
+                          {/* Delete Button */}
+                          <button
+                            onClick={() => handleDeleteProperty(property.id)}
+                            className="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center justify-center gap-2"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                            Delete Property
+                          </button>
+                          
                           {/* YouTube Video */}
                           {property.videoUrl && (
                             <div>
