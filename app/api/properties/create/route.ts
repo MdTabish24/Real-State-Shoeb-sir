@@ -1,15 +1,26 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, NextRequest } from 'next/server';
 import { db } from '@/lib/firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { verifyBuilder } from '@/lib/auth';
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
+    const builder = await verifyBuilder(request);
+    if (!builder) {
+      return NextResponse.json(
+        { success: false, error: 'Unauthorized. Please login as builder.' },
+        { status: 401 }
+      );
+    }
+
     const propertyData = await request.json();
     
     console.log('📝 Creating Property in Firestore:', propertyData.propertyTitle);
     
     const docRef = await addDoc(collection(db, 'properties'), {
       ...propertyData,
+      builderId: builder.id,
+      builderEmail: builder.email,
       createdAt: serverTimestamp(),
       status: 'active',
     });
