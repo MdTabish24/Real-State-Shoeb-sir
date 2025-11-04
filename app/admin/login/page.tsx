@@ -13,20 +13,28 @@ export default function AdminLogin() {
   });
   const [error, setError] = useState('');
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
-    // Check credentials from .env
-    const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL || 'shoeb@estatehub.com';
-    const adminPassword = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'shoeb';
+    try {
+      const response = await fetch('/api/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
 
-    if (formData.email === adminEmail && formData.password === adminPassword) {
-      // Store admin session
-      sessionStorage.setItem('adminLoggedIn', 'true');
-      router.push('/admin');
-    } else {
-      setError('Invalid email or password');
+      const data = await response.json();
+
+      if (data.success) {
+        sessionStorage.setItem('adminLoggedIn', 'true');
+        sessionStorage.setItem('adminToken', data.token);
+        router.push('/admin');
+      } else {
+        setError(data.error || 'Invalid email or password');
+      }
+    } catch (error) {
+      setError('Login failed. Please try again.');
     }
   };
 
@@ -104,10 +112,7 @@ export default function AdminLogin() {
             </motion.button>
           </form>
 
-          <div className="mt-6 text-center text-sm text-gray-500">
-            <p>Default credentials:</p>
-            <p className="font-mono text-xs mt-1">shoeb@estatehub.com / shoeb</p>
-          </div>
+
         </div>
       </motion.div>
     </main>
