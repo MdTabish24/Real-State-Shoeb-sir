@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import ImageKit from 'imagekit';
 
-const imagekit = new ImageKit({
+const getImagekit = () => new ImageKit({
   publicKey: process.env.NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY!,
   privateKey: process.env.IMAGEKIT_PRIVATE_KEY!,
   urlEndpoint: process.env.NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT!,
@@ -18,7 +18,7 @@ export async function POST(request: Request) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
     
-    const result = await imagekit.upload({
+    const result = await getImagekit().upload({
       file: buffer,
       fileName: file.name,
       folder: folder,

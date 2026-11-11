@@ -4,7 +4,7 @@ import { doc, deleteDoc, getDoc } from 'firebase/firestore';
 import { verifyAdmin } from '@/lib/auth';
 import ImageKit from 'imagekit';
 
-const imagekit = new ImageKit({
+const getImagekit = () => new ImageKit({
   publicKey: process.env.NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY!,
   privateKey: process.env.IMAGEKIT_PRIVATE_KEY!,
   urlEndpoint: process.env.NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT!,
@@ -49,7 +49,7 @@ export async function DELETE(request: NextRequest) {
         const fileIdMatch = imageUrl.match(/\/([^\/]+)\?/);
         if (fileIdMatch && fileIdMatch[1]) {
           const fileId = fileIdMatch[1];
-          await imagekit.deleteFile(fileId);
+          await getImagekit().deleteFile(fileId);
           console.log('✅ Deleted image from ImageKit:', fileId);
         }
       } catch (error) {

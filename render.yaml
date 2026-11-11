@@ -3,7 +3,7 @@ services:
     name: real-estate-platform
     runtime: node
     plan: free
-    buildCommand: npm install --no-audit --no-fund && NODE_OPTIONS=--max-old-space-size=400 npx next build
+    buildCommand: npm install --no-audit --no-fund && npm run build
     startCommand: npm start
     envVars:
       - key: NODE_VERSION
